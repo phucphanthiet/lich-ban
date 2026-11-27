@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Đồng hồ vui — bàn học</title>
+<link href="https://fonts.googleapis.com/css?family=Baloo+2:700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; }
+  body { font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;
+         background:#000; color:#fff; overflow:hidden; position:relative;
+         display:flex; flex-direction:column; height:100%;
+         align-items:center; justify-content:space-between; }
+  .star { position:absolute; border-radius:50%; background:#fff;
+          animation:twinkle 2.8s infinite ease-in-out; }
+  @keyframes twinkle { 0%,100% { opacity:.12; } 50% { opacity:.75; } }
+  #owl { position:absolute; top:8px; left:12px; width:62px; height:62px; }
+  .z { position:absolute; color:#8ecbff; font-weight:800; font-style:italic;
+       opacity:0; animation:zfloat 3.6s infinite ease-in; }
+  @keyframes zfloat { 0% { opacity:0; transform:translate(0,0) scale(.7); }
+    25% { opacity:.95; } 100% { opacity:0; transform:translate(14px,-30px) scale(1.15); } }
+  #date { font-size:18px; font-weight:700; color:#c9c9ce; letter-spacing:1px; padding-top:8px; }
+  #date .d { color:#ff5a3c; }
+  #clock { display:flex; align-items:center; justify-content:center;
+           font-family:"Baloo 2",-apple-system,sans-serif; font-weight:800;
+           font-size:148px; line-height:1; transform:scale(0.92,1.42); }
+  .digit { position:relative; display:inline-block; }
+  .face { position:absolute; left:50%; top:12%; width:64%;
+          transform:translateX(-50%) scaleY(0.70); }
+  .colon { display:flex; flex-direction:column; margin:0 3px; }
+  .cdot { width:17px; height:17px; border-radius:50%; background:#E8E8ED;
+          margin:13px 0; animation:bounce 1s infinite alternate ease-in-out; }
+  .cdot.b { animation-delay:.5s; }
+  @keyframes bounce { from { transform:translateY(-5px); } to { transform:translateY(5px); } }
+  #quote { font-size:19px; font-weight:600; font-style:italic; color:#c9c9ce;
+           text-align:center; padding:0 26px 8px 26px; line-height:1.3; }
+</style>
+</head>
+<body>
+  <div id="owl"></div>
+  <div id="date">—</div>
+  <div id="clock"></div>
+  <div id="quote"></div>
+<script>
+var QUOTES = ["Học hôm nay, gặt hái ngày mai", "Tri thức là chìa khóa mở cửa tương lai", "Không có đường tắt nào đến thành công", "Mỗi ngày học một chút, một năm giỏi rất nhiều", "Tương lai thuộc về người chịu học hôm nay", "Học không phải để hơn ai, mà để hơn chính mình hôm qua", "Ước mơ không tự thành hiện thực, phải học mới thành", "Cố gắng hôm nay, tự hào ngày mai", "Đọc thêm một trang sách, mở rộng thêm một chân trời", "Người giỏi không phải bẩm sinh, họ chỉ chăm chỉ hơn", "Thất bại chỉ là một bài học chưa thuộc bài", "Đừng sợ đi chậm, chỉ sợ đứng yên", "Kỷ luật hôm nay, tự do ngày mai", "Học hành là khoản đầu tư có lãi nhất đời người", "Muốn đi thật xa, phải học vững từ hôm nay", "Điểm số không định nghĩa con người, thái độ học mới định nghĩa tương lai", "Mỗi bài toán khó là một bậc thang đi lên", "Hôm nay lười một giờ, ngày mai vất vả gấp đôi", "Sách là người bạn không bao giờ phản bội", "Học để hiểu đời, học để đổi đời", "Thành công mỉm cười với người dậy sớm và chăm chỉ", "Chữ hôm nay học, cơm ngày mai ăn", "Không thầy đố mày làm nên — hãy trân trọng thầy cô", "Hỏi một câu chỉ dốt một lúc, không hỏi dốt cả đời", "Học thầy, học bạn, học cả từ sai lầm", "Việc học như chèo thuyền ngược nước, không tiến ắt lùi", "Có công mài sắt, có ngày nên kim", "Kiến tha lâu cũng đầy tổ — học đều mỗi ngày là thắng", "Chậm mà chắc còn hơn nhanh mà hỏng", "Học một biết mười, suy nghĩ sâu mới giỏi", "Muốn biết phải hỏi, muốn giỏi phải học", "Đầu tư vào tri thức luôn sinh lời cao nhất", "Giáo dục là vũ khí mạnh nhất để thay đổi thế giới", "Người ta có thể lấy đi mọi thứ, trừ tri thức trong đầu bạn", "Học vấn là tài sản không ai cướp được", "Một giờ học chăm chỉ bằng một ngày mơ ước suông", "Đừng đợi có hứng mới học, học rồi hứng sẽ đến", "Việc khó nhất là bắt đầu — cứ mở sách ra trước đã", "Hôm nay đọc sách, ngày mai viết nên tương lai", "Tiếng Anh hôm nay, cánh cửa thế giới ngày mai", "Ngoại ngữ là chiếc vé đi khắp năm châu", "Toán học rèn cái đầu lạnh và trái tim nóng", "Văn học nuôi tâm hồn, khoa học mở trí tuệ", "Mỗi môn học là một mảnh ghép của tương lai", "Đừng học vẹt, hãy học để hiểu", "Hiểu một điều sâu hơn thuộc mười điều nông", "Sai thì sửa, ngã thì đứng dậy học tiếp", "Người thành công từng là học trò chăm chỉ", "Ước mơ lớn bắt đầu từ bài học nhỏ hôm nay", "Hãy học như thể ngày mai là ngày thi — mỗi ngày", "Thời gian học là thời gian không bao giờ phí", "Bạn bè tốt là bạn bè rủ nhau cùng tiến bộ", "Chơi có giờ, học có lúc — cân bằng là giỏi nhất", "Điện thoại để sau, sách vở để trước", "Một năm sau bạn sẽ ước mình bắt đầu từ hôm nay", "Đừng so mình với bạn, hãy so mình với hôm qua", "Giỏi giang là kết quả của ngàn giờ âm thầm cố gắng", "Tài năng không bằng cần cù", "Thông minh là món quà, chăm chỉ là lựa chọn", "Chọn chăm chỉ hôm nay, chọn tương lai sáng ngày mai", "Cha mẹ cho hình hài, thầy cô cho tri thức, bản thân cho tương lai", "Công cha nghĩa mẹ ơn thầy — học giỏi là cách đền đáp đẹp nhất", "Học cho mình trước hết, rồi mới cho gia đình tự hào", "Con đường học vấn không trải hoa hồng, nhưng đích đến rất đẹp", "Mỗi trang vở sạch đẹp là một ngày nghiêm túc với tương lai", "Viết chữ nắn nót, làm người cẩn thận", "Nét chữ là nết người", "Học ăn học nói, học gói học mở", "Lễ phép và chăm học — hai thứ khiến ai cũng quý", "Người học trò tốt hôm nay là công dân tốt ngày mai", "Đất nước cần người tài, gia đình cần người chăm", "Hãy để tương lai cảm ơn bạn của ngày hôm nay", "Ba mươi phút tập trung hơn ba giờ ngồi mơ màng", "Ngủ đủ, ăn đủ, học mới vào đầu", "Đôi mắt quý như vàng — học xong nhớ cho mắt nghỉ ngơi", "Nhìn xa 6 mét sau mỗi 20 phút đọc sách, mắt sẽ cảm ơn bạn", "Thể dục khỏe người, đọc sách khỏe trí", "Một cơ thể khỏe là nền của một cái đầu sáng", "Ngày mới, cơ hội mới để học thêm điều hay", "Hôm nay là ngày trẻ nhất của phần đời còn lại — học ngay thôi", "Đừng để ngày mai phải nói hai chữ giá như", "Cơ hội chỉ đến với người đã chuẩn bị", "Chuẩn bị bài hôm nay, tự tin ngày mai", "Tự tin đến từ việc đã học bài đàng hoàng", "Thi cử chỉ đáng sợ khi mình chưa ôn", "Ôn đều mỗi ngày, thi đến nhẹ như chơi", "Mục tiêu nhỏ mỗi ngày, thành tích lớn cuối năm", "Viết mục tiêu ra giấy, dán lên bàn học, nhìn mỗi ngày", "Ước mơ không có deadline chỉ là mơ mộng", "Hãy biến ước mơ thành kế hoạch, kế hoạch thành việc hôm nay", "Tương lai của bạn được quyết định bởi việc bạn làm hôm nay"];
+var DOW = ["Chủ Nhật","Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy"];
+var COLORS = ["#FFD93D","#6BCB77","#4D96FF","#FF6B9D","#FF9F1C","#FF9F1C"];
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function faceSVG() {
+  return '<svg class="face" viewBox="0 0 120 70">' +
+    '<g class="pup"><circle cx="38" cy="26" r="15" fill="#ffffff"/>' +
+    '<circle class="pupil" cx="38" cy="27" r="7" fill="#26262b"/>' +
+    '<circle cx="40.5" cy="24" r="2.4" fill="#ffffff"/></g>' +
+    '<g class="pup"><circle cx="82" cy="26" r="15" fill="#ffffff"/>' +
+    '<circle class="pupil" cx="82" cy="27" r="7" fill="#26262b"/>' +
+    '<circle cx="84.5" cy="24" r="2.4" fill="#ffffff"/></g>' +
+    '<path d="M44 47 Q60 59 76 47" stroke="#26262b" stroke-width="5" fill="none" stroke-linecap="round"/></svg>';
+}
+/* build digit slots + colons once */
+var clockEl = document.getElementById("clock");
+var slots = [];
+for (var i = 0; i < 8; i++) {
+  if (i === 2 || i === 5) {
+    var col = document.createElement("div"); col.className = "colon";
+    col.innerHTML = '<div class="cdot"></div><div class="cdot b"></div>';
+    clockEl.appendChild(col);
+  } else {
+    var d = document.createElement("span"); d.className = "digit";
+    d.style.color = COLORS[slots.length];
+    d.innerHTML = '<span class="num">0</span>' + faceSVG();
+    clockEl.appendChild(d); slots.push(d);
+  }
+}
+/* owl mascot: open eyes group / closed eyes group, JS blink */
+var OWL_OPEN = '<svg viewBox="0 0 100 100" width="62" height="62">' +
+  '<path d="M18 22 L30 6 L40 20 Z" fill="#8B5E3C"/><path d="M82 22 L70 6 L60 20 Z" fill="#8B5E3C"/>' +
+  '<ellipse cx="50" cy="56" rx="35" ry="39" fill="#8B5E3C"/>' +
+  '<ellipse cx="50" cy="68" rx="20" ry="23" fill="#F3E2C7"/>' +
+  '<ellipse cx="17" cy="60" rx="7" ry="16" fill="#74492A"/>' +
+  '<ellipse cx="83" cy="60" rx="7" ry="16" fill="#74492A"/>' +
+  '<g id="owlOpen"><circle cx="36" cy="44" r="11.5" fill="#ffffff"/><circle cx="64" cy="44" r="11.5" fill="#ffffff"/>' +
+  '<circle cx="36" cy="45" r="5.6" fill="#26262b"/><circle cx="64" cy="45" r="5.6" fill="#26262b"/>' +
+  '<circle cx="38" cy="42.5" r="1.9" fill="#ffffff"/><circle cx="66" cy="42.5" r="1.9" fill="#ffffff"/></g>' +
+  '<g id="owlShut" style="display:none"><path d="M26 45 Q36 51 46 45" stroke="#26262b" stroke-width="3.4" fill="none" stroke-linecap="round"/>' +
+  '<path d="M54 45 Q64 51 74 45" stroke="#26262b" stroke-width="3.4" fill="none" stroke-linecap="round"/></g>' +
+  '<path d="M44 55 L56 55 L50 63 Z" fill="#FF9F1C"/></svg>';
+document.getElementById("owl").innerHTML = OWL_OPEN +
+  '<span class="z" id="z1" style="left:52px;top:2px;font-size:15px;">Z</span>' +
+  '<span class="z" id="z2" style="left:60px;top:-4px;font-size:20px;animation-delay:1.2s;">Z</span>' +
+  '<span class="z" id="z3" style="left:70px;top:-10px;font-size:26px;animation-delay:2.4s;">Z</span>';
+var owlSleeping = false;
+function owlBlink() {
+  var o = document.getElementById("owlOpen"), s = document.getElementById("owlShut");
+  if (!o || owlSleeping) return;
+  o.style.display = "none"; s.style.display = "";
+  setTimeout(function(){ o.style.display = ""; s.style.display = "none"; }, 140);
+}
+setInterval(owlBlink, 3900);
+/* stars */
+for (var st = 0; st < 16; st++) {
+  var sp = document.createElement("span"); sp.className = "star";
+  var sz = 2 + Math.random() * 2.5;
+  sp.style.width = sz + "px"; sp.style.height = sz + "px";
+  sp.style.left = (Math.random() * 96 + 1) + "%";
+  sp.style.top = (Math.random() * 92 + 2) + "%";
+  sp.style.animationDelay = (Math.random() * 2.8) + "s";
+  document.body.appendChild(sp);
+}
+/* wandering pupils */
+function wander() {
+  var pups = document.querySelectorAll(".pupil");
+  var dx = Math.round(Math.random() * 6 - 3), dy = Math.round(Math.random() * 4 - 2);
+  for (var i = 0; i < pups.length; i++) {
+    var base = (i % 2 === 0) ? 38 : 82;
+    pups[i].setAttribute("cx", base + dx);
+    pups[i].setAttribute("cy", 27 + dy);
+  }
+}
+setInterval(wander, 2600);
+/* clock + date + quote + owl sleep mode */
+var lastDay = -1, lastStr = "";
+function render() {
+  var now = new Date();
+  var str = pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+  if (str !== lastStr) {
+    lastStr = str;
+    for (var i = 0; i < 6; i++) {
+      var numEl = slots[i].querySelector(".num");
+      if (numEl.textContent !== str.charAt(i)) numEl.textContent = str.charAt(i);
+    }
+  }
+  var h = now.getHours();
+  var sleep = (h >= 22 || h < 5);
+  if (sleep !== owlSleeping) {
+    owlSleeping = sleep;
+    document.getElementById("owlOpen").style.display = sleep ? "none" : "";
+    document.getElementById("owlShut").style.display = sleep ? "" : "none";
+    var zs = document.querySelectorAll(".z");
+    for (var z = 0; z < zs.length; z++) zs[z].style.display = sleep ? "" : "none";
+  }
+  if (now.getDate() !== lastDay) {
+    lastDay = now.getDate();
+    document.getElementById("date").innerHTML =
+      DOW[now.getDay()] + ' · <span class="d">' + pad(now.getDate()) + "/" + pad(now.getMonth() + 1) +
+      "</span>/" + now.getFullYear();
+    var start = new Date(now.getFullYear(), 0, 0);
+    var doy = Math.floor((now - start) / 86400000);
+    document.getElementById("quote").innerHTML = "“" + QUOTES[(doy - 1) % QUOTES.length] + "”";
+  }
+}
+var zsInit = document.querySelectorAll(".z");
+for (var zi = 0; zi < zsInit.length; zi++) zsInit[zi].style.display = "none";
+render();
+setInterval(render, 250);
+setTimeout(function(){ location.reload(); }, 6 * 60 * 60 * 1000);
+</script>
+</body>
+</html>
